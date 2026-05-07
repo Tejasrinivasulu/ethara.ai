@@ -5,7 +5,9 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Replace this with your deployed backend URL (Render/Railway/Fly/etc.)
+[functions]
+  directory = "netlify/functions"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
