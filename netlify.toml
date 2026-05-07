@@ -20,9 +20,3 @@
   to = "/.netlify/functions/socketio/:splat"
   status = 200
   force = true
-
-# SPA/route fallback
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
