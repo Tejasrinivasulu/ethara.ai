@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
 import {
   members as initialMembers,
   notifications as initialNotifications,
@@ -31,7 +30,6 @@ let state: WorkspaceState = {
 
 const listeners = new Set<() => void>();
 const bc = typeof window !== "undefined" && "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL) : null;
-let socket: Socket | null = null;
 let backendConnected = false;
 
 function uniqueById<T extends { id: string }>(items: T[]): T[] {
@@ -160,17 +158,6 @@ async function fetchWorkspaceFromApi() {
   }
 }
 
-function connectSocket() {
-  if (typeof window === "undefined" || socket) return;
-  socket = io(API_BASE, { transports: ["websocket", "polling"] });
-  socket.on("connect", () => {
-    backendConnected = true;
-  });
-  socket.on("workspace:update", (next: WorkspaceState) => {
-    writePersistedState(next);
-  });
-}
-
 async function apiRequest(path: string, init: RequestInit) {
   const auth = readAuthFromStorage();
   const adminEmail = auth.role === "admin" ? auth.email : "";
@@ -194,8 +181,10 @@ async function apiRequest(path: string, init: RequestInit) {
 
 if (typeof window !== "undefined") {
   state = readPersistedState();
-  connectSocket();
   fetchWorkspaceFromApi();
+  window.setInterval(() => {
+    void fetchWorkspaceFromApi();
+  }, 5000);
   window.addEventListener("storage", (e) => {
     if (e.key !== KEY) return;
     state = readPersistedState();
