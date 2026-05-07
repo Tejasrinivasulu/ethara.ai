@@ -1,0 +1,26 @@
+[build]
+  command = "npm run build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Replace this with your deployed backend URL (Render/Railway/Fly/etc.)
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-domain.com/api/:splat"
+  status = 200
+  force = true
+
+# Socket.IO endpoint proxy
+[[redirects]]
+  from = "/socket.io/*"
+  to = "https://your-backend-domain.com/socket.io/:splat"
+  status = 200
+  force = true
+
+# SPA/route fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
